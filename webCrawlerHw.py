@@ -12,12 +12,14 @@ import hashlib, time, re
 from random import random
 
 def crawl(seeds, param=None):
+    #sets the param to 10 if none is specified
     if param is None:
         param = 10
         
     frontier = seeds
     visited_urls = set()
     
+    #runs through the crawl param times
     i = 0
     while i < param: 
         crawl_url = frontier.pop()
@@ -38,7 +40,7 @@ def crawl(seeds, param=None):
             continue
     
         contents = str(resp.read())
-        #print(contents)
+        #prints out the filename using the specified hash
         filename = 'pages/' + hashlib.md5(crawl_url.encode()).hexdigest()
         f = open("%s.html" % filename, 'w')
         f.write(contents)
@@ -46,10 +48,12 @@ def crawl(seeds, param=None):
         
         discovered_urls = set()
         links = soup('a')
+        #regex for keeping the crawler within mst.edu
         matchPer = re.compile('.*mst\.edu.*')
         for link in links:
             if ('href' in dict(link.attrs)):
                 url = urljoin(crawl_url, link['href'])
+                #if the link is in the regex
                 if matchPer.search(url):
                     if (url[0:4] == 'http' and url not in visited_urls
                         and url not in discovered_urls and url not in frontier):
